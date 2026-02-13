@@ -137,6 +137,41 @@
                 nix build .#quantumsec-vmware
             '';
           });
+
+      mkEvalTargetsApp = hostSystem:
+        let
+          hostPkgs = mkPkgs hostSystem;
+          app = hostPkgs.writeShellApplication {
+            name = "eval-linux-targets";
+            text = ''
+              exec "${self}/tests/eval_linux_targets.sh" "$@"
+            '';
+          };
+        in
+        {
+          eval-linux-targets = {
+            type = "app";
+            program = "${app}/bin/eval-linux-targets";
+            meta = {
+              description = "Evaluate x86_64-linux host/image/security-summary derivation paths";
+            };
+          };
+        };
+
+      linuxSmokeApp = {
+        smoke-quantum = {
+          type = "app";
+          program = "${pkgs.writeShellApplication {
+            name = "smoke-quantum";
+            text = ''
+              exec "${self}/tests/smoke_quantum.sh" "$@"
+            '';
+          }}/bin/smoke-quantum";
+          meta = {
+            description = "Run the quantum-lab smoke test";
+          };
+        };
+      };
     in
     {
       nixosConfigurations = {
@@ -157,6 +192,12 @@
       };
 
       devShells.${linuxSystem} = quantumShells;
+
+      apps =
+        (lib.genAttrs [ "x86_64-darwin" "aarch64-darwin" ] mkEvalTargetsApp)
+        // {
+          ${linuxSystem} = (mkEvalTargetsApp linuxSystem) // linuxSmokeApp;
+        };
 
       checks.${linuxSystem} = {
         "format-nix" = pkgs.runCommand "format-nix" { nativeBuildInputs = [ pkgs.alejandra ]; } ''

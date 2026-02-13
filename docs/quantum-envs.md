@@ -32,6 +32,8 @@ nix develop .#quantum-lab -c python quantum/examples/tiny_optimization_demo.py
 
 ```bash
 ./tests/smoke_quantum.sh
+# or via app output (x86_64-linux)
+nix run .#smoke-quantum
 ```
 
 ## Untrusted notebook workflow (rootless containers)

@@ -73,6 +73,8 @@ Use this helper to verify Linux target derivations from any host:
 
 ```bash
 ./tests/eval_linux_targets.sh
+# or via app output
+nix run .#eval-linux-targets
 ```
 
 GitHub Actions runs:

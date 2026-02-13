@@ -23,6 +23,7 @@ nix build .#quantumsec-vmware
 
 # Evaluate Linux target derivations
 ./tests/eval_linux_targets.sh
+nix run .#eval-linux-targets
 
 # Generate security summaries from evaluated host configs
 nix build .#quantumsec-security-summary-headless
@@ -30,6 +31,9 @@ nix build .#quantumsec-security-summary-desktop
 
 # Enter the unified lab shell and run the tiny demo
 nix develop .#quantum-lab -c python quantum/examples/tiny_optimization_demo.py
+
+# Run the smoke test through flake app
+nix run .#smoke-quantum
 ```
 
 ## Supported targets
