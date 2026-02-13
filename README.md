@@ -21,6 +21,13 @@ nix flake check
 nix build .#quantumsec-iso
 nix build .#quantumsec-vmware
 
+# Evaluate Linux target derivations
+./tests/eval_linux_targets.sh
+
+# Generate security summaries from evaluated host configs
+nix build .#quantumsec-security-summary-headless
+nix build .#quantumsec-security-summary-desktop
+
 # Enter the unified lab shell and run the tiny demo
 nix develop .#quantum-lab -c python quantum/examples/tiny_optimization_demo.py
 ```

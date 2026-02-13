@@ -1,0 +1,31 @@
+name: Nix CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  validate-linux-targets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Show Nix version
+        run: nix --version
+
+      - name: Flake checks
+        run: nix flake check --print-build-logs
+
+      - name: Evaluate Linux image outputs
+        run: ./tests/eval_linux_targets.sh
+
+      - name: Build quantum smoke check
+        run: nix build .#checks.x86_64-linux.smoke-quantum --print-build-logs

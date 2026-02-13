@@ -56,6 +56,47 @@
         })
       ];
 
+      mkSecurityPolicyCheck = name: cfg:
+        let
+          c = cfg.config;
+          ssh = c.services.openssh.settings;
+        in
+        assert c.networking.firewall.enable;
+        assert ssh.PasswordAuthentication == false;
+        assert ssh.KbdInteractiveAuthentication == false;
+        assert ssh.PermitRootLogin == "no";
+        assert c.nix.settings.sandbox == true;
+        assert c.virtualisation.podman.enable;
+        assert c.virtualisation.podman.dockerCompat == false;
+        assert c.boot.kernel.sysctl."kernel.kptr_restrict" == 2;
+        assert c.boot.kernel.sysctl."kernel.dmesg_restrict" == 1;
+        assert c.boot.kernel.sysctl."kernel.unprivileged_bpf_disabled" == 1;
+        pkgs.writeText "policy-${name}.txt" ''
+          security-policy=${name}:ok
+        '';
+
+      boolText = b: if b then "true" else "false";
+
+      mkSecuritySummary = name: cfg:
+        let
+          c = cfg.config;
+          ssh = c.services.openssh.settings;
+        in
+        pkgs.writeText "security-summary-${name}.txt" ''
+          host=${name}
+          firewall.enabled=${boolText c.networking.firewall.enable}
+          firewall.allowPing=${boolText c.networking.firewall.allowPing}
+          ssh.passwordAuthentication=${boolText ssh.PasswordAuthentication}
+          ssh.kbdInteractiveAuthentication=${boolText ssh.KbdInteractiveAuthentication}
+          ssh.permitRootLogin=${ssh.PermitRootLogin}
+          nix.sandbox=${boolText c.nix.settings.sandbox}
+          podman.enable=${boolText c.virtualisation.podman.enable}
+          podman.dockerCompat=${boolText c.virtualisation.podman.dockerCompat}
+          sysctl.kernel.kptr_restrict=${toString c.boot.kernel.sysctl."kernel.kptr_restrict"}
+          sysctl.kernel.dmesg_restrict=${toString c.boot.kernel.sysctl."kernel.dmesg_restrict"}
+          sysctl.kernel.unprivileged_bpf_disabled=${toString c.boot.kernel.sysctl."kernel.unprivileged_bpf_disabled"}
+        '';
+
       quantumShells = {
         "quantum-lab" = import ./quantum/shells/default.nix { inherit pkgs; };
         qiskit = import ./quantum/shells/qiskit.nix { inherit pkgs; };
@@ -107,6 +148,8 @@
         ${linuxSystem} = {
           quantumsec-desktop = desktop.config.system.build.toplevel;
           quantumsec-headless = headless.config.system.build.toplevel;
+          quantumsec-security-summary-desktop = mkSecuritySummary "desktop" desktop;
+          quantumsec-security-summary-headless = mkSecuritySummary "headless" headless;
           "quantumsec-iso" = mkImageOutput isoConfig "iso" "isoImage";
           "quantumsec-vmware" = mkImageOutput vmwareConfig "vmware" "vmwareImage";
           default = mkImageOutput isoConfig "iso" "isoImage";
@@ -141,6 +184,8 @@
           (mkImageOutput isoConfig "iso" "isoImage").drvPath;
         "eval-image-vmware" = pkgs.writeText "eval-image-vmware.drvpath"
           (mkImageOutput vmwareConfig "vmware" "vmwareImage").drvPath;
+        "policy-desktop" = mkSecurityPolicyCheck "desktop" desktop;
+        "policy-headless" = mkSecurityPolicyCheck "headless" headless;
 
         "smoke-quantum" = pkgs.runCommand "smoke-quantum"
           {
