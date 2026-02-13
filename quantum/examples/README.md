@@ -6,6 +6,7 @@ This folder contains tiny offline-friendly examples that run inside the `quantum
 
 ```bash
 nix develop .#quantum-lab -c python quantum/examples/tiny_optimization_demo.py
+nix develop .#quantum-lab -c python quantum/examples/qasm_roundtrip_demo.py --allow-missing
 ```
 
 ## What it demonstrates

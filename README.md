@@ -31,6 +31,7 @@ nix build .#quantumsec-security-summary-desktop
 
 # Enter the unified lab shell and run the tiny demo
 nix develop .#quantum-lab -c python quantum/examples/tiny_optimization_demo.py
+nix develop .#quantum-lab -c python quantum/examples/qasm_roundtrip_demo.py --allow-missing
 
 # Run the smoke test through flake app
 nix run .#smoke-quantum

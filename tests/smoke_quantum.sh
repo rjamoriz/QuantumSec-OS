@@ -15,6 +15,7 @@ fi
 cd "${REPO_ROOT}"
 
 python quantum/examples/tiny_optimization_demo.py --smoke
+python quantum/examples/qasm_roundtrip_demo.py --allow-missing
 python - <<'PY'
 import importlib
 
