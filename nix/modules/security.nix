@@ -29,7 +29,7 @@
   };
 
   security.sudo.wheelNeedsPassword = true;
-  users.mutableUsers = lib.mkDefault false;
+  users.mutableUsers = lib.mkDefault true;
 
   boot.kernel.sysctl = {
     "kernel.kptr_restrict" = 2;

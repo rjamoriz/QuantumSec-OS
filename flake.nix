@@ -7,17 +7,19 @@
 
   outputs = { self, nixpkgs }:
     let
-      system = "x86_64-linux";
+      linuxSystem = "x86_64-linux";
       lib = nixpkgs.lib;
 
-      pkgs = import nixpkgs {
+      mkPkgs = system: import nixpkgs {
         inherit system;
         config.allowUnfree = false;
       };
 
+      pkgs = mkPkgs linuxSystem;
+
       mkNixos = modules:
         lib.nixosSystem {
-          inherit system;
+          system = linuxSystem;
           specialArgs = {
             inherit self;
           };
@@ -74,6 +76,22 @@
         ]
         ++ optionalPy "qiskit"
         ++ optionalPy "pennylane");
+
+      hostDefaultPackages = lib.genAttrs [ "x86_64-darwin" "aarch64-darwin" ]
+        (hostSystem:
+          let
+            hostPkgs = mkPkgs hostSystem;
+          in
+          {
+            default = hostPkgs.writeText "quantumsec-os-${hostSystem}-default.txt" ''
+              QuantumSec OS default output for ${hostSystem}
+
+              Primary supported build target: x86_64-linux
+              Build explicit artifacts:
+                nix build .#quantumsec-iso
+                nix build .#quantumsec-vmware
+            '';
+          });
     in
     {
       nixosConfigurations = {
@@ -81,14 +99,17 @@
         quantumsec-headless = headless;
       };
 
-      packages.${system} = {
-        "quantumsec-iso" = mkImageOutput isoConfig "iso" "isoImage";
-        "quantumsec-vmware" = mkImageOutput vmwareConfig "vmware" "vmwareImage";
+      packages = hostDefaultPackages // {
+        ${linuxSystem} = {
+          "quantumsec-iso" = mkImageOutput isoConfig "iso" "isoImage";
+          "quantumsec-vmware" = mkImageOutput vmwareConfig "vmware" "vmwareImage";
+          default = mkImageOutput isoConfig "iso" "isoImage";
+        };
       };
 
-      devShells.${system} = quantumShells;
+      devShells.${linuxSystem} = quantumShells;
 
-      checks.${system} = {
+      checks.${linuxSystem} = {
         "format-nix" = pkgs.runCommand "format-nix" { nativeBuildInputs = [ pkgs.alejandra ]; } ''
           cd ${self}
           alejandra --check .

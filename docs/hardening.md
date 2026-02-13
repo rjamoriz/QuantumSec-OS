@@ -58,5 +58,6 @@ Chosen approach: rootless Podman containers for untrusted notebooks/tools.
 
 ## Notes
 
+- `users.mutableUsers = true` is set to avoid lockout during first boot; after provisioning SSH keys/passwords, you can switch to immutable users.
 - User accounts are intentionally declared with `hashedPassword = "!"` as a safe default; set SSH keys before deployment.
 - Security-relevant changes should be reflected here and in commit messages.
