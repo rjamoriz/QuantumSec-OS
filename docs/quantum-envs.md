@@ -12,13 +12,15 @@ nix develop .#cirq
 nix develop .#pytket
 ```
 
+If a framework is present but incompatible in the pinned nixpkgs snapshot, the shell excludes it and prints a notice.
+
 `quantum-lab` includes:
 
-- Python 3.12
+- Python 3.11
 - JupyterLab
 - numpy/scipy/matplotlib/networkx
 - cvxpy
-- Qiskit/PennyLane and optional Cirq/pytket if available in the pinned nixpkgs snapshot
+- Qiskit/PennyLane and optional Cirq/pytket when available and compatible in the pinned nixpkgs snapshot
 
 ## Run example
 

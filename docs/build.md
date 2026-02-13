@@ -54,3 +54,5 @@ Result symlink points to the VMware image derivation output.
 ## macOS note
 
 This repository targets `x86_64-linux` NixOS builds. Build images on Linux for predictable results.
+
+On macOS, `nix build` intentionally resolves to a small host-local default output, while Linux image artifacts remain explicit targets (`.#quantumsec-iso`, `.#quantumsec-vmware`).

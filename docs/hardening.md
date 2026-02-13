@@ -58,6 +58,7 @@ Chosen approach: rootless Podman containers for untrusted notebooks/tools.
 
 ## Notes
 
+- Installer image overlay keeps SSH root login disabled and disables `networking.wireless` to avoid conflicts with NetworkManager.
 - `users.mutableUsers = true` is set to avoid lockout during first boot; after provisioning SSH keys/passwords, you can switch to immutable users.
 - User accounts are intentionally declared with `hashedPassword = "!"` as a safe default; set SSH keys before deployment.
 - Security-relevant changes should be reflected here and in commit messages.

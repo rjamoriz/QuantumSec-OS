@@ -29,7 +29,8 @@
       mkImageOutput = cfg: imageName: fallbackName:
         lib.attrByPath [ "system" "build" "images" imageName ]
           (lib.attrByPath [ "system" "build" fallbackName ]
-            (throw "Missing image output ${imageName}/${fallbackName}"))
+            (throw "Missing image output ${imageName}/${fallbackName}")
+            cfg.config)
           cfg.config;
 
       headless = mkNixos [ ./nix/hosts/quantumsec-headless.nix ];
@@ -40,7 +41,9 @@
         "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
         ({ lib, ... }: {
           networking.hostName = lib.mkForce "quantumsec-installer";
+          networking.wireless.enable = lib.mkForce false;
           users.users.researcher.hashedPassword = lib.mkForce "!";
+          services.openssh.settings.PermitRootLogin = lib.mkForce "no";
         })
       ];
 
@@ -61,12 +64,13 @@
         pytket = import ./quantum/shells/pytket.nix { inherit pkgs; };
       };
 
-      pyPkgs = pkgs.python312Packages;
+      pyPkgs = pkgs.python311Packages;
       hasPy = name: builtins.hasAttr name pyPkgs;
       getPy = name: builtins.getAttr name pyPkgs;
-      optionalPy = name: if hasPy name then [ (getPy name) ] else [ ];
+      isUsablePy = name: hasPy name && (builtins.tryEval (getPy name).drvPath).success;
+      optionalPy = name: if isUsablePy name then [ (getPy name) ] else [ ];
 
-      smokePython = pkgs.python312.withPackages (_:
+      smokePython = pkgs.python311.withPackages (_:
         [
           pyPkgs.cvxpy
           pyPkgs.matplotlib
@@ -101,6 +105,8 @@
 
       packages = hostDefaultPackages // {
         ${linuxSystem} = {
+          quantumsec-desktop = desktop.config.system.build.toplevel;
+          quantumsec-headless = headless.config.system.build.toplevel;
           "quantumsec-iso" = mkImageOutput isoConfig "iso" "isoImage";
           "quantumsec-vmware" = mkImageOutput vmwareConfig "vmware" "vmwareImage";
           default = mkImageOutput isoConfig "iso" "isoImage";
@@ -122,11 +128,19 @@
           quantumShells.qiskit.drvPath;
         "eval-shell-pennylane" = pkgs.writeText "eval-shell-pennylane.drvpath"
           quantumShells.pennylane.drvPath;
+        "eval-shell-cirq" = pkgs.writeText "eval-shell-cirq.drvpath"
+          quantumShells.cirq.drvPath;
+        "eval-shell-pytket" = pkgs.writeText "eval-shell-pytket.drvpath"
+          quantumShells.pytket.drvPath;
 
         "eval-nixos-headless" = pkgs.writeText "eval-nixos-headless.drvpath"
           headless.config.system.build.toplevel.drvPath;
         "eval-nixos-desktop" = pkgs.writeText "eval-nixos-desktop.drvpath"
           desktop.config.system.build.toplevel.drvPath;
+        "eval-image-iso" = pkgs.writeText "eval-image-iso.drvpath"
+          (mkImageOutput isoConfig "iso" "isoImage").drvPath;
+        "eval-image-vmware" = pkgs.writeText "eval-image-vmware.drvpath"
+          (mkImageOutput vmwareConfig "vmware" "vmwareImage").drvPath;
 
         "smoke-quantum" = pkgs.runCommand "smoke-quantum"
           {

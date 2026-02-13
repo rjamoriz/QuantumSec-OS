@@ -1,10 +1,11 @@
 { pkgs }:
 let
-  pyPkgs = pkgs.python312Packages;
-  hasPytket = builtins.hasAttr "pytket" pyPkgs;
+  pyPkgs = pkgs.python311Packages;
+  hasPytket = builtins.hasAttr "pytket" pyPkgs
+    && (builtins.tryEval pyPkgs.pytket.drvPath).success;
   pytketPkgs = if hasPytket then [ pyPkgs.pytket ] else [ ];
 
-  pythonEnv = pkgs.python312.withPackages (ps:
+  pythonEnv = pkgs.python311.withPackages (ps:
     with ps;
     [
       ipython
@@ -19,6 +20,6 @@ pkgs.mkShell {
 
   shellHook = ''
     echo "[pytket] shell ready"
-    ${if hasPytket then "" else "echo \"[pytket] pytket missing from nixpkgs snapshot\""}
+    ${if hasPytket then "" else "echo \"[pytket] pytket unavailable or incompatible in current nixpkgs snapshot\""}
   '';
 }

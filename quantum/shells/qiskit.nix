@@ -1,10 +1,11 @@
 { pkgs }:
 let
-  pyPkgs = pkgs.python312Packages;
-  hasQiskit = builtins.hasAttr "qiskit" pyPkgs;
+  pyPkgs = pkgs.python311Packages;
+  hasQiskit = builtins.hasAttr "qiskit" pyPkgs
+    && (builtins.tryEval pyPkgs.qiskit.drvPath).success;
   qiskitPkgs = if hasQiskit then [ pyPkgs.qiskit ] else [ ];
 
-  pythonEnv = pkgs.python312.withPackages (ps:
+  pythonEnv = pkgs.python311.withPackages (ps:
     with ps;
     [
       ipython
@@ -21,6 +22,6 @@ pkgs.mkShell {
 
   shellHook = ''
     echo "[qiskit] shell ready"
-    ${if hasQiskit then "" else "echo \"[qiskit] qiskit missing from nixpkgs snapshot\""}
+    ${if hasQiskit then "" else "echo \"[qiskit] qiskit unavailable or incompatible in current nixpkgs snapshot\""}
   '';
 }

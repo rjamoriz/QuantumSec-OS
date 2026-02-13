@@ -1,10 +1,11 @@
 { pkgs }:
 let
-  pyPkgs = pkgs.python312Packages;
-  hasPennyLane = builtins.hasAttr "pennylane" pyPkgs;
+  pyPkgs = pkgs.python311Packages;
+  hasPennyLane = builtins.hasAttr "pennylane" pyPkgs
+    && (builtins.tryEval pyPkgs.pennylane.drvPath).success;
   pennyPkgs = if hasPennyLane then [ pyPkgs.pennylane ] else [ ];
 
-  pythonEnv = pkgs.python312.withPackages (ps:
+  pythonEnv = pkgs.python311.withPackages (ps:
     with ps;
     [
       cvxpy
@@ -22,6 +23,6 @@ pkgs.mkShell {
 
   shellHook = ''
     echo "[pennylane] shell ready"
-    ${if hasPennyLane then "" else "echo \"[pennylane] pennylane missing from nixpkgs snapshot\""}
+    ${if hasPennyLane then "" else "echo \"[pennylane] pennylane unavailable or incompatible in current nixpkgs snapshot\""}
   '';
 }

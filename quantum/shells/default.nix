@@ -1,13 +1,14 @@
 { pkgs }:
 let
-  pyPkgs = pkgs.python312Packages;
-  has = name: builtins.hasAttr name pyPkgs;
+  pyPkgs = pkgs.python311Packages;
+  hasAttr = name: builtins.hasAttr name pyPkgs;
   get = name: builtins.getAttr name pyPkgs;
-  optional = name: if has name then [ (get name) ] else [ ];
+  isUsable = name: hasAttr name && (builtins.tryEval (get name).drvPath).success;
+  optional = name: if isUsable name then [ (get name) ] else [ ];
 
   desired = [ "qiskit" "pennylane" "cirq" "pytket" ];
-  present = builtins.filter has desired;
-  missing = builtins.filter (name: !(has name)) desired;
+  present = builtins.filter isUsable desired;
+  missing = builtins.filter (name: !(isUsable name)) desired;
 
   presentText =
     if present == [ ] then "none"
@@ -17,7 +18,7 @@ let
     if missing == [ ] then ""
     else builtins.concatStringsSep ", " missing;
 
-  pythonEnv = pkgs.python312.withPackages (ps:
+  pythonEnv = pkgs.python311.withPackages (ps:
     with ps;
     [
       cvxpy
@@ -49,7 +50,7 @@ pkgs.mkShell {
     echo "[quantum-lab] available quantum frameworks: ${presentText}"
     ${if missing == [ ]
       then ""
-      else "echo \"[quantum-lab] unavailable in current nixpkgs snapshot: ${missingText}\""}
+      else "echo \"[quantum-lab] unavailable or incompatible in current nixpkgs snapshot: ${missingText}\""}
     echo "[quantum-lab] run: python quantum/examples/tiny_optimization_demo.py"
   '';
 }
