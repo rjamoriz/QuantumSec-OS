@@ -158,7 +158,7 @@
           };
         };
 
-      linuxSmokeApp = {
+      linuxOperatorApps = {
         smoke-quantum = {
           type = "app";
           program = "${pkgs.writeShellApplication {
@@ -169,6 +169,18 @@
           }}/bin/smoke-quantum";
           meta = {
             description = "Run the quantum-lab smoke test";
+          };
+        };
+        run-untrusted-notebook = {
+          type = "app";
+          program = "${pkgs.writeShellApplication {
+            name = "run-untrusted-notebook";
+            text = ''
+              exec "${self}/quantum/sandbox/run_untrusted_notebook.sh" "$@"
+            '';
+          }}/bin/run-untrusted-notebook";
+          meta = {
+            description = "Launch hardened rootless Podman notebook sandbox";
           };
         };
       };
@@ -196,7 +208,7 @@
       apps =
         (lib.genAttrs [ "x86_64-darwin" "aarch64-darwin" ] mkEvalTargetsApp)
         // {
-          ${linuxSystem} = (mkEvalTargetsApp linuxSystem) // linuxSmokeApp;
+          ${linuxSystem} = (mkEvalTargetsApp linuxSystem) // linuxOperatorApps;
         };
 
       checks.${linuxSystem} = {

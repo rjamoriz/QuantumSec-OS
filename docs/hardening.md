@@ -55,6 +55,7 @@ Chosen approach: rootless Podman containers for untrusted notebooks/tools.
 - Podman is enabled without Docker socket compatibility.
 - Researchers run untrusted tools in rootless containers instead of host Python.
 - Quantum framework development remains in Nix dev shells to keep dependency closure reproducible.
+- `quantum/sandbox/run_untrusted_notebook.sh` applies container hardening defaults (`--cap-drop=ALL`, `no-new-privileges`, read-only rootfs, tmpfs scratch, PID/memory limits).
 
 ## Notes
 

@@ -35,6 +35,9 @@ nix develop .#quantum-lab -c python quantum/examples/qasm_roundtrip_demo.py --al
 
 # Run the smoke test through flake app
 nix run .#smoke-quantum
+
+# Launch hardened untrusted notebook sandbox (Linux + Podman)
+nix run .#run-untrusted-notebook
 ```
 
 ## Supported targets

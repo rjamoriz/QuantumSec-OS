@@ -42,7 +42,15 @@ nix run .#smoke-quantum
 Example:
 
 ```bash
-podman run --rm -it -p 8888:8888 docker.io/jupyter/scipy-notebook:latest
+nix run .#run-untrusted-notebook
+# or directly
+./quantum/sandbox/run_untrusted_notebook.sh
 ```
 
 Use containers for untrusted notebooks/tools; keep trusted reproducible work in Nix dev shells.
+
+Environment knobs for the sandbox script:
+
+- `NOTEBOOK_PORT` (default `8888`)
+- `NOTEBOOK_TOKEN` (default `quantumsec`)
+- `NOTEBOOK_WORKDIR` (default current directory)
