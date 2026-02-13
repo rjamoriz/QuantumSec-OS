@@ -2,11 +2,11 @@
 {
   imports = [
     ../modules/security.nix
-    ../modules/headless.nix
+    ../modules/desktop.nix
     ../modules/quantum.nix
   ];
 
-  networking.hostName = "quantumsec-headless";
+  networking.hostName = "quantumsec-desktop";
 
   time.timeZone = "UTC";
   i18n.defaultLocale = "en_US.UTF-8";
@@ -24,7 +24,7 @@
   users.users.researcher = {
     isNormalUser = true;
     description = "QuantumSec Research Operator";
-    extraGroups = [ "wheel" "networkmanager" "podman" ];
+    extraGroups = [ "wheel" "networkmanager" "podman" "audio" "video" "input" ];
     hashedPassword = "!";
     openssh.authorizedKeys.keys = lib.mkDefault [ ];
   };
