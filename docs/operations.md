@@ -39,6 +39,13 @@ Timer checks are included in the audit. Manual inspection:
 systemctl status quantumsec-baseline-report.timer
 ```
 
+You can inspect evaluated policy snapshots without booting:
+
+```bash
+nix run .#show-security-summary -- headless  # x86_64-linux
+nix run .#show-security-summary -- desktop   # x86_64-linux
+```
+
 ## 4) Optional: switch to immutable users after provisioning
 
 `users.mutableUsers = true` is used by default to avoid lockout on first boot.

@@ -44,6 +44,8 @@ Result symlink points to the VMware image derivation output.
 ```bash
 nix build .#quantumsec-security-summary-headless
 nix build .#quantumsec-security-summary-desktop
+nix run .#show-security-summary -- headless  # x86_64-linux
+nix run .#show-security-summary -- desktop   # x86_64-linux
 ```
 
 These outputs contain evaluated baseline hardening values for each host profile.

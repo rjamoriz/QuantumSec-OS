@@ -224,6 +224,18 @@
             description = "Run checks and build Linux ISO/VMware/security artifacts";
           };
         };
+        show-security-summary = {
+          type = "app";
+          program = "${pkgs.writeShellApplication {
+            name = "show-security-summary";
+            text = ''
+              exec "${self}/scripts/show_security_summary.sh" "$@"
+            '';
+          }}/bin/show-security-summary";
+          meta = {
+            description = "Build and print evaluated security summary (headless|desktop)";
+          };
+        };
         host-hardening-audit = {
           type = "app";
           program = "${pkgs.writeShellApplication {
