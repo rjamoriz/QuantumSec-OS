@@ -1,69 +1,66 @@
-# Hardening Baseline
+# Hardening Baseline (v1)
 
-This document explains the security posture implemented in v1.
+This document explains the security posture implemented by `nix/modules/security.nix` and related modules.
 
-## Network and remote access
+## Network and SSH
 
-- Firewall enabled (`networking.firewall.enable = true`): default deny inbound unless explicitly opened.
-- ICMP ping blocked by default (`allowPing = false`) to reduce trivial host discovery.
-- OpenSSH hardened:
+- Firewall enabled by default:
+  - `networking.firewall.enable = true`
+  - `networking.firewall.allowPing = false`
+- OpenSSH enabled with hardening:
   - `PasswordAuthentication = false`
   - `KbdInteractiveAuthentication = false`
   - `PermitRootLogin = "no"`
-  - `AllowTcpForwarding = "no"`
+  - `AllowUsers = [ "quantum" ]`
   - `AllowAgentForwarding = false`
-  - Lower `MaxAuthTries` and short `LoginGraceTime`
+  - `AllowTcpForwarding = "no"`
+
+This keeps remote access key-only while still allowing local console login.
 
 ## Nix hardening
 
-- Nix sandbox enabled (`nix.settings.sandbox = true`) for isolated builds.
-- Trusted users restricted to `root` and `@wheel`.
-- Allowed Nix users restricted to `@wheel` to avoid arbitrary local build users.
-- Flakes + nix-command explicitly enabled.
+- `nix.settings.sandbox = true`
+- `trusted-users = [ "root" "@wheel" ]`
+- `allowed-users = [ "@wheel" ]`
+- flakes + `nix-command` enabled explicitly
 
 ## Kernel/sysctl hardening
 
-Applied in `nix/modules/security.nix`:
+- `kernel.kptr_restrict = 2`
+- `kernel.dmesg_restrict = 1`
+- `kernel.unprivileged_bpf_disabled = 1`
+- `net.core.bpf_jit_harden = 2`
+- `kernel.sysrq = 0`
+- `fs.protected_fifos = 2`
+- `fs.protected_hardlinks = 1`
+- `fs.protected_symlinks = 1`
+- `net.ipv4.tcp_syncookies = 1`
+- Redirects disabled (`accept_redirects` and `send_redirects`)
+- IPv4 reverse path filter enabled (`rp_filter`)
 
-- `kernel.kptr_restrict = 2`: restrict kernel pointer exposure.
-- `kernel.dmesg_restrict = 1`: block unprivileged kernel log access.
-- `kernel.unprivileged_bpf_disabled = 1` and `net.core.bpf_jit_harden = 2`: reduce BPF abuse risk.
-- `kernel.sysrq = 0`: disable magic SysRq in normal operation.
-- `fs.protected_*` settings: improve link/FIFO safety.
-- `net.ipv4.tcp_syncookies = 1`: protect against SYN floods.
-- Disable IPv4/IPv6 redirects and enable IPv4 rp_filter.
-- Ignore suspicious/bogus ICMP behaviors.
+These reduce common local privilege-escalation and network attack surfaces without blocking normal VM workflows.
 
-## systemd service hardening
+## Minimal services
 
-Custom service `quantumsec-baseline-report` is explicitly hardened:
+- Disabled by default:
+  - printing (`services.printing.enable = false`)
+  - Avahi/mDNS (`services.avahi.enable = false`)
+- Optional AppArmor support enabled:
+  - `security.apparmor.enable = true`
 
-- `NoNewPrivileges=true`
-- `PrivateTmp=true`
-- `ProtectSystem=strict`
-- `ProtectHome=true`
-- `ProtectKernelTunables=true`
-- `ProtectControlGroups=true`
-- `LockPersonality=true`
-- `RestrictSUIDSGID=true`
-- Uses a dedicated state directory (`/var/lib/quantumsec`)
-- Timer `quantumsec-baseline-report.timer` refreshes the baseline report periodically (`OnUnitActiveSec=24h`, `Persistent=true`)
+## VMware guest readiness
 
-## Research sandbox pattern (v1)
+`nix/modules/vmware.nix` enables:
+- `services.open-vm-tools.enable = true`
+- `virtualisation.vmware.guest.enable = true`
+- VMware initrd modules (`vmw_pvscsi`, `vmxnet3`)
 
-Chosen approach: rootless Podman containers for untrusted notebooks/tools.
+## v1 convenience credential
 
-- Podman is enabled without Docker socket compatibility.
-- Researchers run untrusted tools in rootless containers instead of host Python.
-- Quantum framework development remains in Nix dev shells to keep dependency closure reproducible.
-- `quantum/sandbox/run_untrusted_notebook.sh` applies container hardening defaults (`--cap-drop=ALL`, `no-new-privileges`, read-only rootfs, tmpfs scratch, PID/memory limits).
+User `quantum` is configured with initial password `quantum` for first-boot VM convenience.
 
-## Notes
+You should change it immediately after install:
 
-- Installer image overlay keeps SSH root login disabled and disables `networking.wireless` to avoid conflicts with NetworkManager.
-- VMware ISO/VMDK builds apply `nix/modules/vmware.nix`, which enables explicit VMware guest support and initrd VMware storage/network drivers.
-- `users.mutableUsers = true` is set to avoid lockout during first boot; after provisioning SSH keys/passwords, you can switch to immutable users.
-- User accounts are intentionally declared with `hashedPassword = "!"` as a safe default; set SSH keys before deployment.
-- You can generate evaluated policy summaries via `nix build .#quantumsec-security-summary-headless`, `nix build .#quantumsec-security-summary-desktop`, and `nix build .#quantumsec-security-summary-vmware`.
-- Use `nix run .#host-hardening-audit` on deployed hosts to verify baseline settings.
-- Security-relevant changes should be reflected here and in commit messages.
+```bash
+passwd quantum
+```

@@ -1,6 +1,11 @@
-{ lib, ... }:
 {
-  # Keep VMware guest support explicit for both installer ISO and VMDK outputs.
+  lib,
+  pkgs,
+  ...
+}: {
+  environment.systemPackages = [pkgs.open-vm-tools];
+
+  # Keep VMware guest support explicit for installer and installed guests.
   virtualisation.vmware.guest.enable = true;
 
   # Prefer VMware virtual hardware drivers at early boot for stable bring-up.

@@ -1,22 +1,22 @@
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   programs.direnv.enable = true;
   programs.direnv.nix-direnv.enable = true;
 
-  virtualisation.podman = {
-    enable = true;
-    dockerCompat = false;
-    defaultNetwork.settings.dns_enabled = true;
-    autoPrune = {
-      enable = true;
-      flags = [ "--all" "--filter=until=72h" ];
-    };
-  };
-
   environment.systemPackages = with pkgs; [
-    bash
     git
-    gnupg
-    podman-compose
+    nixd
+    nil
+    (writeShellScriptBin "quantumsec-shells" ''
+            cat <<'EOF'
+      Use isolated, reproducible quantum environments:
+        nix develop .#quantum-lab
+        nix develop .#qiskit
+        nix develop .#pennylane
+        nix develop .#cirq
+
+      Run the tiny demo:
+        nix develop .#quantum-lab -c python quantum/examples/tiny_optimization_demo.py
+      EOF
+    '')
   ];
 }

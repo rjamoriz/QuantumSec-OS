@@ -1,45 +1,49 @@
-# Threat Model (Initial v1)
+# Threat Model (v1)
 
 ## Scope
 
-- Single-user research workstation running NixOS
-- Quantum optimization experimentation, notebooks, and simulations
-- Build/release artifacts: installer ISO and VMware image
+- Single VMware Fusion guest running QuantumSec OS
+- Quantum simulator and hybrid optimization workloads
+- SDK access to cloud quantum backends (for example IBM/Qiskit Runtime, AWS Braket)
 
-## Security objectives
+## Assets to protect
 
-- Preserve integrity of OS configuration and research code
-- Reduce attack surface of remote access and default services
-- Isolate untrusted research workloads from host baseline
+- Research code and notebooks
+- API credentials/tokens used for cloud quantum services
+- Integrity of NixOS configuration and build artifacts
 
-## Assets
+## Security goals
 
-- Source code and experiment notebooks
-- SSH keys and operator credentials
-- Reproducible Nix configurations and build outputs
+- Keep remote access hardened by default
+- Limit default attack surface in the VM
+- Prevent dependency drift by using reproducible dev shells
+- Separate base OS from experimental Python environments
 
 ## Assumptions
 
-- Trusted operator controls flake updates
-- Host firmware and hardware are outside v1 scope
-- No secrets are stored directly in this repository
+- VMware host is reasonably trusted and maintained
+- Operator controls flake updates
+- Secrets are not committed to this repository
 
-## Adversaries
+## Main threats
 
-- Opportunistic internet scanning/brute force attempts on SSH
-- Malicious notebook/tool dependencies run by researcher
-- Accidental insecure local configuration drift
+- Brute-force and opportunistic SSH attacks
+- Malicious or compromised Python dependencies in research tooling
+- Misconfiguration drift after manual host changes
+- Credential leakage from notebooks/scripts
 
-## Initial mitigations
+## v1 mitigations
 
-- Firewall enabled by default
-- SSH key-only auth, password auth disabled, root SSH disabled
-- Minimal default services
-- Hardened kernel/sysctl baseline
-- Rootless Podman workflow for untrusted research tooling
+- Firewall enabled
+- SSH key-only authentication with root login disabled
+- Nix sandboxing and restricted trusted users
+- Minimal enabled services
+- Sysctl hardening for kernel/network surfaces
+- Quantum dependencies isolated in `nix develop` shells
 
-## Deferred items
+## Deferred work (v2+)
 
-- Secure boot / TPM measured boot policy
-- Full disk encryption installer flow
-- Centralized audit log pipeline and SIEM integration
+- Full disk encryption flow in installer
+- Secure boot / measured boot policy
+- Optional unattended install profile
+- Artifact signing and release provenance

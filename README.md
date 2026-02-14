@@ -1,74 +1,71 @@
 # QuantumSec OS
 
-QuantumSec OS is a flake-based NixOS repository for a reproducible, security-hardened quantum optimization workstation.
+QuantumSec OS is a NixOS-based Linux distribution project for quantum computing workflows, delivered as a bootable installer ISO for VMware Fusion.
 
-## Goals
+## Project goals
 
-- Secure-by-default NixOS baseline for desktop and headless use
-- Reproducible quantum research dev environments without polluting system profiles
-- Build targets for installer ISO and VMware (VMDK) image
+- Bootable ISO that installs a persistent QuantumSec VM
+- Security-hardened baseline (firewall, hardened SSH, sandboxed Nix builds)
+- Reproducible quantum development environments in isolated `nix develop` shells
+- Practical VMware guest integration (`open-vm-tools`, VMware guest enablement)
 
-## Quickstart (x86_64-linux)
-
-```bash
-# Generate/update lock file on a Linux host with Nix installed
-nix flake lock
-
-# Run checks
-nix flake check
-nix run .#scan-secrets
-
-# Build images
-nix build .#quantumsec-iso
-nix build .#quantumsec-vmware-iso
-nix build .#quantumsec-vmware
-nix run .#show-vmware-artifacts
-
-# Evaluate Linux target derivations
-./tests/eval_linux_targets.sh
-nix run .#eval-linux-targets
-
-# Generate security summaries from evaluated host configs
-nix build .#quantumsec-security-summary-headless
-nix build .#quantumsec-security-summary-desktop
-nix build .#quantumsec-security-summary-vmware
-nix run .#show-security-summary -- headless  # x86_64-linux
-nix run .#show-security-summary -- desktop   # x86_64-linux
-nix run .#show-security-summary -- vmware    # x86_64-linux
-
-# Enter the unified lab shell and run the tiny demo
-nix develop .#quantum-lab -c python quantum/examples/tiny_optimization_demo.py
-nix develop .#quantum-lab -c python quantum/examples/qasm_roundtrip_demo.py --allow-missing
-nix develop .#quantum-lab -c python quantum/examples/pennylane_hybrid_demo.py --allow-missing
-
-# Run the smoke test through flake app
-nix run .#smoke-quantum
-
-# Launch hardened untrusted notebook sandbox (Linux + Podman)
-nix run .#run-untrusted-notebook
-
-# One-command Linux validation + artifact builds
-nix run .#build-linux-artifacts
-
-# Post-boot host hardening audit (run on target host)
-nix run .#host-hardening-audit
-```
-
-## Supported targets
+## Supported target
 
 - `x86_64-linux`
 
-## Design
+## Quickstart
 
-- Architecture and decisions: `docs/design.md`
-- VMware deployment runbook: `docs/vmware.md`
+```bash
+nix flake lock
+nix flake check
+nix build .#quantumsec-iso
+```
 
-## Layout
+On macOS, `nix build .#quantumsec-iso` produces a guidance artifact.
+The real Linux ISO derivation is:
 
-- `flake.nix`: flake outputs for hosts, images, dev shells, checks
-- `nix/hosts`: host entry points
-- `nix/modules`: reusable security/desktop/headless/quantum modules
-- `quantum/shells`: isolated quantum development shells
-- `quantum/examples`: tiny offline-friendly demos
-- `docs/`: threat model, hardening rationale, build/run docs
-- `tests/`: lightweight smoke checks
+```bash
+nix eval --raw .#packages.x86_64-linux.quantumsec-iso.drvPath
+nix build .#packages.x86_64-linux.quantumsec-iso
+```
+
+## VMware install flow (persistent VM)
+
+1. Build ISO: `nix build .#quantumsec-iso`
+2. In VMware Fusion, create a Linux VM in UEFI mode and attach the built ISO.
+3. Boot ISO and run `quantumsec-install-guide` in the installer shell.
+4. Install to VM disk using the provided command:
+   - `nixos-install --root /mnt --flake <repo>#quantumsec-vmware`
+5. Reboot into installed system.
+
+Default local login for v1 convenience:
+- user: `quantum`
+- password: `quantum`
+
+Change the password immediately after first boot.
+
+## Quantum environments
+
+```bash
+nix develop .#quantum-lab
+nix develop .#qiskit
+nix develop .#pennylane
+nix develop .#cirq
+```
+
+Run the example:
+
+```bash
+nix develop .#quantum-lab -c python quantum/examples/tiny_optimization_demo.py
+```
+
+## Repository layout
+
+- `flake.nix`
+- `flake.lock`
+- `AGENTS.md`
+- `nix/modules/{base,security,vmware,quantum,desktop}.nix`
+- `nix/iso/installer-iso.nix`
+- `quantum/examples/`
+- `docs/{build,quantum-envs,hardening,threat-model}.md`
+- `tests/smoke_quantum.sh`

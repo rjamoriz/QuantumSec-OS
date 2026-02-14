@@ -1,119 +1,62 @@
-# Build and Test
+# Build and VMware Boot Guide
 
-All commands below are for a Linux machine with Nix (flakes enabled).
-
-## 1) Lock dependencies
+## 1) Lock and validate
 
 ```bash
 nix flake lock
-```
-
-## 2) Run checks
-
-```bash
 nix flake check
 ```
 
-Checks cover:
-
-- Nix formatting (`alejandra --check`)
-- Secret and key-pattern scanning (`scripts/scan_for_secrets.sh`)
-- Dev shell evaluation
-- NixOS configuration evaluation
-- Security policy assertions for desktop/headless hosts
-- Quantum smoke script execution
-
-## 3) Build installer ISO
+## 2) Build the QuantumSec installer ISO
 
 ```bash
 nix build .#quantumsec-iso
-nix build .#quantumsec-vmware-iso
 ```
 
-Result symlink points to the ISO derivation output. For VMware ISO-first installs, use `quantumsec-vmware-iso`.
+The ISO artifact is produced from `packages.x86_64-linux.quantumsec-iso`.
 
-Artifact path introspection without building:
+On macOS, `nix build .#quantumsec-iso` intentionally produces a guidance artifact.
+To target the real ISO output:
 
 ```bash
-nix run .#show-vmware-artifacts
+nix eval --raw .#packages.x86_64-linux.quantumsec-iso.drvPath
+nix build .#packages.x86_64-linux.quantumsec-iso
 ```
 
-## 4) Build VMware image (VMDK)
+## 3) Boot in VMware Fusion
+
+1. Create a new VM and choose Linux (64-bit).
+2. Use UEFI firmware mode.
+3. Attach the built ISO from `./result/iso/*.iso`.
+4. Allocate at least 4 vCPU and 8 GB RAM for simulator-heavy workloads.
+5. Boot the VM.
+
+## 4) Install for persistence
+
+In the installer shell:
 
 ```bash
-nix build .#quantumsec-vmware
+sudo -i
+quantumsec-install-guide
 ```
 
-Result symlink points to the VMware image derivation output.
-
-## 4.1) Build security summary artifacts (optional)
+Follow those commands to partition, format, mount, and run:
 
 ```bash
-nix build .#quantumsec-security-summary-headless
-nix build .#quantumsec-security-summary-desktop
-nix build .#quantumsec-security-summary-vmware
-nix run .#show-security-summary -- headless  # x86_64-linux
-nix run .#show-security-summary -- desktop   # x86_64-linux
-nix run .#show-security-summary -- vmware    # x86_64-linux
+nixos-install --root /mnt --flake <this-repo>#quantumsec-vmware
 ```
 
-These outputs contain evaluated baseline hardening values for each host profile.
+This installs the persistent QuantumSec profile (not the live installer environment).
 
-## 5) Boot/test guidance
-
-### ISO
-
-1. Write ISO to USB or attach to VM.
-2. Boot and confirm networking + SSH hardening defaults.
-3. Validate `researcher` account and SSH key configuration before exposure.
-
-### VMware
-
-1. Create VM from built VMDK.
-2. Boot and confirm host identity (`hostnamectl`) and firewall state.
-3. Check VMware guest integration (`systemctl status vmtoolsd`).
-4. Run `systemctl status sshd` and `sshd -T | grep -E 'passwordauthentication|permitrootlogin'`.
-
-## macOS note
-
-This repository targets `x86_64-linux` NixOS builds. Build images on Linux for predictable results.
-
-On macOS, `nix build` intentionally resolves to a small host-local default output, while Linux image artifacts remain explicit targets (`.#quantumsec-iso`, `.#quantumsec-vmware`).
-
-For VMware-specific VM settings and end-to-end boot workflow, see `docs/vmware.md`.
-
-## CI and target evaluation
-
-Use this helper to verify Linux target derivations from any host:
+## 5) First boot checks after install
 
 ```bash
-./tests/eval_linux_targets.sh
-# or via app output
-nix run .#eval-linux-targets
+hostnamectl
+systemctl status vmtoolsd
+sshd -T | grep -E 'passwordauthentication|permitrootlogin|allowusers'
 ```
 
-GitHub Actions runs:
-
-- `nix flake check`
-- `./tests/eval_linux_targets.sh`
-- `nix build .#checks.x86_64-linux.smoke-quantum`
-
-## One-command Linux pipeline
-
-On a Linux host, you can run the full v1 artifact flow:
-
-```bash
-nix run .#build-linux-artifacts
-```
-
-This executes checks, target evaluation, image builds, and security summary builds.
-
-## Host audit
-
-After booting a built system, run:
-
-```bash
-nix run .#host-hardening-audit
-```
-
-This validates SSH, firewall, key sysctls, and Nix sandbox settings on the running host.
+Expected:
+- `passwordauthentication no`
+- `permitrootlogin no`
+- `allowusers quantum`
