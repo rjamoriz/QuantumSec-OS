@@ -44,4 +44,8 @@ echo "[eval] security summary desktop drv"
 drv="$("${NIX[@]}" eval --raw .#packages.x86_64-linux.quantumsec-security-summary-desktop.drvPath)"
 echo "$drv"
 
+echo "[eval] security summary vmware drv"
+drv="$("${NIX[@]}" eval --raw .#packages.x86_64-linux.quantumsec-security-summary-vmware.drvPath)"
+echo "$drv"
+
 echo "eval-linux-targets=ok"

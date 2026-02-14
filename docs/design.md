@@ -20,7 +20,7 @@ Flake package outputs (`x86_64-linux`):
 - `quantumsec-vmware`: VMware image derivation (VMDK path)
 - `quantumsec-desktop`: desktop host system closure
 - `quantumsec-headless`: headless host system closure
-- `quantumsec-security-summary-headless` / `quantumsec-security-summary-desktop`: evaluated security baselines
+- `quantumsec-security-summary-headless` / `quantumsec-security-summary-desktop` / `quantumsec-security-summary-vmware`: evaluated security baselines
 
 ## Host design
 
@@ -47,6 +47,8 @@ Flake package outputs (`x86_64-linux`):
   2. Import resulting VMDK into VMware
   3. Boot and run host audit
 
+Both VMware outputs share `nix/modules/vmware.nix`, which keeps VMware guest support explicit and includes VMware storage/network initrd modules for predictable early boot in VMware guests.
+
 ## Security architecture
 
 Layered controls in `nix/modules/security.nix`:
@@ -62,6 +64,7 @@ Policy is enforced at evaluation time via flake checks:
 
 - `checks.x86_64-linux.policy-headless`
 - `checks.x86_64-linux.policy-desktop`
+- `checks.x86_64-linux.policy-vmware`
 
 These fail when critical baseline expectations regress.
 

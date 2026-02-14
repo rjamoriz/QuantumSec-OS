@@ -49,18 +49,19 @@
 
       vmwareIsoConfig = mkNixos [
         ./nix/hosts/quantumsec-desktop.nix
+        ./nix/modules/vmware.nix
         "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
         ({ lib, ... }: {
           networking.hostName = lib.mkForce "quantumsec-vmware-installer";
           networking.wireless.enable = lib.mkForce false;
           users.users.researcher.hashedPassword = lib.mkForce "!";
           services.openssh.settings.PermitRootLogin = lib.mkForce "no";
-          virtualisation.vmware.guest.enable = true;
         })
       ];
 
       vmwareConfig = mkNixos [
         ./nix/hosts/quantumsec-headless.nix
+        ./nix/modules/vmware.nix
         "${nixpkgs}/nixos/modules/virtualisation/vmware-image.nix"
         ({ lib, ... }: {
           networking.hostName = lib.mkForce "quantumsec-vmware";
@@ -274,6 +275,7 @@
           quantumsec-headless = headless.config.system.build.toplevel;
           quantumsec-security-summary-desktop = mkSecuritySummary "desktop" desktop;
           quantumsec-security-summary-headless = mkSecuritySummary "headless" headless;
+          quantumsec-security-summary-vmware = mkSecuritySummary "vmware" vmwareConfig;
           "quantumsec-iso" = mkImageOutput isoConfig "iso" "isoImage";
           "quantumsec-vmware-iso" = mkImageOutput vmwareIsoConfig "iso" "isoImage";
           "quantumsec-vmware" = mkImageOutput vmwareConfig "vmware" "vmwareImage";
@@ -363,6 +365,7 @@
           (mkImageOutput vmwareConfig "vmware" "vmwareImage").drvPath;
         "policy-desktop" = mkSecurityPolicyCheck "desktop" desktop;
         "policy-headless" = mkSecurityPolicyCheck "headless" headless;
+        "policy-vmware" = mkSecurityPolicyCheck "vmware" vmwareConfig;
 
         "smoke-quantum" = pkgs.runCommand "smoke-quantum"
           {

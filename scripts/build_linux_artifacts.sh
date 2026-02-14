@@ -26,6 +26,10 @@ echo "[3/4] build linux images"
 "${NIX[@]}" build .#quantumsec-iso .#quantumsec-vmware-iso .#quantumsec-vmware --print-build-logs
 
 echo "[4/4] build security summaries"
-"${NIX[@]}" build .#quantumsec-security-summary-headless .#quantumsec-security-summary-desktop --print-build-logs
+"${NIX[@]}" build \
+  .#quantumsec-security-summary-headless \
+  .#quantumsec-security-summary-desktop \
+  .#quantumsec-security-summary-vmware \
+  --print-build-logs
 
 echo "build-linux-artifacts=ok"

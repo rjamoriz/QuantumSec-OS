@@ -45,8 +45,10 @@ Result symlink points to the VMware image derivation output.
 ```bash
 nix build .#quantumsec-security-summary-headless
 nix build .#quantumsec-security-summary-desktop
+nix build .#quantumsec-security-summary-vmware
 nix run .#show-security-summary -- headless  # x86_64-linux
 nix run .#show-security-summary -- desktop   # x86_64-linux
+nix run .#show-security-summary -- vmware    # x86_64-linux
 ```
 
 These outputs contain evaluated baseline hardening values for each host profile.
@@ -63,7 +65,8 @@ These outputs contain evaluated baseline hardening values for each host profile.
 
 1. Create VM from built VMDK.
 2. Boot and confirm host identity (`hostnamectl`) and firewall state.
-3. Run `systemctl status sshd` and `sshd -T | grep -E 'passwordauthentication|permitrootlogin'`.
+3. Check VMware guest integration (`systemctl status vmtoolsd`).
+4. Run `systemctl status sshd` and `sshd -T | grep -E 'passwordauthentication|permitrootlogin'`.
 
 ## macOS note
 

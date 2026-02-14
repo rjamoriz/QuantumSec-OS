@@ -44,6 +44,7 @@ You can inspect evaluated policy snapshots without booting:
 ```bash
 nix run .#show-security-summary -- headless  # x86_64-linux
 nix run .#show-security-summary -- desktop   # x86_64-linux
+nix run .#show-security-summary -- vmware    # x86_64-linux
 ```
 
 ## 4) Optional: switch to immutable users after provisioning

@@ -11,8 +11,11 @@ case "$TARGET" in
   desktop)
     ATTR="quantumsec-security-summary-desktop"
     ;;
+  vmware)
+    ATTR="quantumsec-security-summary-vmware"
+    ;;
   *)
-    echo "usage: $0 [headless|desktop]"
+    echo "usage: $0 [headless|desktop|vmware]"
     exit 1
     ;;
 esac

@@ -32,3 +32,6 @@ jobs:
 
       - name: Evaluate VMware ISO target
         run: nix eval --raw .#packages.x86_64-linux.quantumsec-vmware-iso.drvPath
+
+      - name: Evaluate VMware security summary target
+        run: nix eval --raw .#packages.x86_64-linux.quantumsec-security-summary-vmware.drvPath
