@@ -60,6 +60,8 @@
         let
           c = cfg.config;
           ssh = c.services.openssh.settings;
+          reportSvc = c.systemd.services.quantumsec-baseline-report.serviceConfig;
+          reportTimer = c.systemd.timers.quantumsec-baseline-report.timerConfig;
         in
         assert c.networking.firewall.enable;
         assert ssh.PasswordAuthentication == false;
@@ -71,6 +73,12 @@
         assert c.boot.kernel.sysctl."kernel.kptr_restrict" == 2;
         assert c.boot.kernel.sysctl."kernel.dmesg_restrict" == 1;
         assert c.boot.kernel.sysctl."kernel.unprivileged_bpf_disabled" == 1;
+        assert reportSvc.NoNewPrivileges == true;
+        assert reportSvc.PrivateTmp == true;
+        assert reportSvc.ProtectSystem == "strict";
+        assert reportSvc.ProtectHome == true;
+        assert reportTimer.Persistent == true;
+        assert reportTimer.OnUnitActiveSec == "24h";
         pkgs.writeText "policy-${name}.txt" ''
           security-policy=${name}:ok
         '';
@@ -81,6 +89,8 @@
         let
           c = cfg.config;
           ssh = c.services.openssh.settings;
+          reportSvc = c.systemd.services.quantumsec-baseline-report.serviceConfig;
+          reportTimer = c.systemd.timers.quantumsec-baseline-report.timerConfig;
         in
         pkgs.writeText "security-summary-${name}.txt" ''
           host=${name}
@@ -95,6 +105,12 @@
           sysctl.kernel.kptr_restrict=${toString c.boot.kernel.sysctl."kernel.kptr_restrict"}
           sysctl.kernel.dmesg_restrict=${toString c.boot.kernel.sysctl."kernel.dmesg_restrict"}
           sysctl.kernel.unprivileged_bpf_disabled=${toString c.boot.kernel.sysctl."kernel.unprivileged_bpf_disabled"}
+          service.quantumsec-baseline-report.NoNewPrivileges=${boolText reportSvc.NoNewPrivileges}
+          service.quantumsec-baseline-report.PrivateTmp=${boolText reportSvc.PrivateTmp}
+          service.quantumsec-baseline-report.ProtectSystem=${reportSvc.ProtectSystem}
+          service.quantumsec-baseline-report.ProtectHome=${boolText reportSvc.ProtectHome}
+          timer.quantumsec-baseline-report.OnUnitActiveSec=${reportTimer.OnUnitActiveSec}
+          timer.quantumsec-baseline-report.Persistent=${boolText reportTimer.Persistent}
         '';
 
       quantumShells = {

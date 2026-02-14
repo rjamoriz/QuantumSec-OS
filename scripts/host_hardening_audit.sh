@@ -47,6 +47,12 @@ else
   check_equals "firewall.is-enabled" "disabled" "enabled"
 fi
 
+if systemctl is-enabled quantumsec-baseline-report.timer >/dev/null 2>&1; then
+  check_equals "timer.quantumsec-baseline-report" "enabled" "enabled"
+else
+  check_equals "timer.quantumsec-baseline-report" "disabled" "enabled"
+fi
+
 kptr="$(sysctl -n kernel.kptr_restrict 2>/dev/null || echo missing)"
 dmesg="$(sysctl -n kernel.dmesg_restrict 2>/dev/null || echo missing)"
 bpf="$(sysctl -n kernel.unprivileged_bpf_disabled 2>/dev/null || echo missing)"

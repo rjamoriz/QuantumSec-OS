@@ -47,6 +47,7 @@ Custom service `quantumsec-baseline-report` is explicitly hardened:
 - `LockPersonality=true`
 - `RestrictSUIDSGID=true`
 - Uses a dedicated state directory (`/var/lib/quantumsec`)
+- Timer `quantumsec-baseline-report.timer` refreshes the baseline report periodically (`OnUnitActiveSec=24h`, `Persistent=true`)
 
 ## Research sandbox pattern (v1)
 

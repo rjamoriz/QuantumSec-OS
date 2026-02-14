@@ -86,4 +86,15 @@
       ReadWritePaths = [ "/var/lib/quantumsec" ];
     };
   };
+
+  systemd.timers.quantumsec-baseline-report = {
+    description = "Periodic hardened baseline report refresh";
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnBootSec = "10m";
+      OnUnitActiveSec = "24h";
+      Persistent = true;
+      RandomizedDelaySec = "15m";
+    };
+  };
 }

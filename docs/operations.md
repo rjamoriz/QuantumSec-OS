@@ -33,6 +33,12 @@ Expected result:
 host-hardening-audit=ok
 ```
 
+Timer checks are included in the audit. Manual inspection:
+
+```bash
+systemctl status quantumsec-baseline-report.timer
+```
+
 ## 4) Optional: switch to immutable users after provisioning
 
 `users.mutableUsers = true` is used by default to avoid lockout on first boot.
