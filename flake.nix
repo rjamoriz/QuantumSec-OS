@@ -185,6 +185,18 @@
               description = "Evaluate x86_64-linux host/image/security-summary derivation paths";
             };
           };
+          show-vmware-artifacts = {
+            type = "app";
+            program = "${hostPkgs.writeShellApplication {
+              name = "show-vmware-artifacts";
+              text = ''
+                exec "${self}/scripts/show_vmware_artifacts.sh" "$@"
+              '';
+            }}/bin/show-vmware-artifacts";
+            meta = {
+              description = "Print evaluated VMware ISO/VMDK derivation and output paths";
+            };
+          };
           scan-secrets = {
             type = "app";
             program = "${hostPkgs.writeShellApplication {

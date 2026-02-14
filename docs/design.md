@@ -79,8 +79,9 @@ These fail when critical baseline expectations regress.
 
 - `nix run .#scan-secrets`: repository secret-pattern scan
 - `nix run .#eval-linux-targets`: verify Linux target derivations
+- `nix run .#show-vmware-artifacts`: print evaluated VMware ISO/VMDK paths
 - `nix run .#build-linux-artifacts`: run checks + build Linux artifacts
-- `nix run .#show-security-summary -- headless|desktop`: print evaluated baseline summary
+- `nix run .#show-security-summary -- headless|desktop|vmware`: print evaluated baseline summary
 - `nix run .#host-hardening-audit`: post-boot host audit
 
 ## Current tradeoffs

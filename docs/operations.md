@@ -60,6 +60,7 @@ After user credentials and keys are provisioned, you can switch to immutable use
 
 ```bash
 nix run .#build-linux-artifacts
+nix run .#show-vmware-artifacts
 ```
 
 This runs checks, evaluates targets, builds ISO/VMware images, and builds security summaries.

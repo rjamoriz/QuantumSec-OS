@@ -32,6 +32,12 @@ nix build .#quantumsec-vmware-iso
 
 Result symlink points to the ISO derivation output. For VMware ISO-first installs, use `quantumsec-vmware-iso`.
 
+Artifact path introspection without building:
+
+```bash
+nix run .#show-vmware-artifacts
+```
+
 ## 4) Build VMware image (VMDK)
 
 ```bash
@@ -73,6 +79,8 @@ These outputs contain evaluated baseline hardening values for each host profile.
 This repository targets `x86_64-linux` NixOS builds. Build images on Linux for predictable results.
 
 On macOS, `nix build` intentionally resolves to a small host-local default output, while Linux image artifacts remain explicit targets (`.#quantumsec-iso`, `.#quantumsec-vmware`).
+
+For VMware-specific VM settings and end-to-end boot workflow, see `docs/vmware.md`.
 
 ## CI and target evaluation
 

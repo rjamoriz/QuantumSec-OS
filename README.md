@@ -22,6 +22,7 @@ nix run .#scan-secrets
 nix build .#quantumsec-iso
 nix build .#quantumsec-vmware-iso
 nix build .#quantumsec-vmware
+nix run .#show-vmware-artifacts
 
 # Evaluate Linux target derivations
 ./tests/eval_linux_targets.sh
@@ -60,6 +61,7 @@ nix run .#host-hardening-audit
 ## Design
 
 - Architecture and decisions: `docs/design.md`
+- VMware deployment runbook: `docs/vmware.md`
 
 ## Layout
 
