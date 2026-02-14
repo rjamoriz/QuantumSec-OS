@@ -5,10 +5,6 @@
   security.polkit.enable = true;
   services.dbus.enable = true;
 
-  programs.hyprland = {
-    enable = true;
-    xwayland.enable = true;
-  };
   programs.sway.enable = true;
   programs.dconf.enable = true;
 
@@ -16,7 +12,7 @@
     enable = true;
     settings = {
       default_session = {
-        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --remember --sessions /run/current-system/sw/share/wayland-sessions --cmd Hyprland";
+        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --remember --sessions /run/current-system/sw/share/wayland-sessions --cmd sway";
         user = "greeter";
       };
     };
@@ -36,12 +32,8 @@
 
   environment.systemPackages = with pkgs; [
     foot
-    grim
     mako
-    slurp
-    swaybg
     waybar
     wl-clipboard
-    wofi
   ];
 }

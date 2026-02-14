@@ -6,7 +6,7 @@ let
   isUsable = name: hasAttr name && (builtins.tryEval (get name).drvPath).success;
   optional = name: if isUsable name then [ (get name) ] else [ ];
 
-  desired = [ "qiskit" "pennylane" "cirq" "pytket" ];
+  desired = [ "qiskit" "pennylane" "cirq" ];
   present = builtins.filter isUsable desired;
   missing = builtins.filter (name: !(isUsable name)) desired;
 
@@ -27,23 +27,18 @@ let
       matplotlib
       networkx
       numpy
-      pip
       scipy
     ]
     ++ optional "qiskit"
     ++ optional "pennylane"
-    ++ optional "cirq"
-    ++ optional "pytket");
+    ++ optional "cirq");
 in
 pkgs.mkShell {
   name = "quantum-lab";
 
   packages = [
     pythonEnv
-    pkgs.alejandra
     pkgs.git
-    pkgs.nil
-    pkgs.ruff
   ];
 
   shellHook = ''

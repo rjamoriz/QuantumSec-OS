@@ -19,7 +19,7 @@ let
 in
 pkgs.mkShell {
   name = "pennylane-shell";
-  packages = [ pythonEnv pkgs.git pkgs.ruff ];
+  packages = [ pythonEnv pkgs.git ];
 
   shellHook = ''
     echo "[pennylane] shell ready"
