@@ -82,3 +82,13 @@ GitHub Actions runs:
 - `nix flake check`
 - `./tests/eval_linux_targets.sh`
 - `nix build .#checks.x86_64-linux.smoke-quantum`
+
+## One-command Linux pipeline
+
+On a Linux host, you can run the full v1 artifact flow:
+
+```bash
+nix run .#build-linux-artifacts
+```
+
+This executes checks, target evaluation, image builds, and security summary builds.

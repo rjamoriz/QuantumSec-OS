@@ -32,12 +32,16 @@ nix build .#quantumsec-security-summary-desktop
 # Enter the unified lab shell and run the tiny demo
 nix develop .#quantum-lab -c python quantum/examples/tiny_optimization_demo.py
 nix develop .#quantum-lab -c python quantum/examples/qasm_roundtrip_demo.py --allow-missing
+nix develop .#quantum-lab -c python quantum/examples/pennylane_hybrid_demo.py --allow-missing
 
 # Run the smoke test through flake app
 nix run .#smoke-quantum
 
 # Launch hardened untrusted notebook sandbox (Linux + Podman)
 nix run .#run-untrusted-notebook
+
+# One-command Linux validation + artifact builds
+nix run .#build-linux-artifacts
 ```
 
 ## Supported targets

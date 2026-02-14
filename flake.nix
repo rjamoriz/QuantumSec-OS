@@ -183,6 +183,18 @@
             description = "Launch hardened rootless Podman notebook sandbox";
           };
         };
+        build-linux-artifacts = {
+          type = "app";
+          program = "${pkgs.writeShellApplication {
+            name = "build-linux-artifacts";
+            text = ''
+              exec "${self}/scripts/build_linux_artifacts.sh" "$@"
+            '';
+          }}/bin/build-linux-artifacts";
+          meta = {
+            description = "Run checks and build Linux ISO/VMware/security artifacts";
+          };
+        };
       };
     in
     {
@@ -217,6 +229,39 @@
           alejandra --check .
           touch $out
         '';
+
+        "shellcheck" = pkgs.runCommand "shellcheck"
+          {
+            nativeBuildInputs = [ pkgs.findutils pkgs.shellcheck ];
+          }
+          ''
+            cd ${self}
+            shell_files="$(find tests quantum/sandbox scripts -type f -name '*.sh' -print)"
+            if [ -n "$shell_files" ]; then
+              shellcheck $shell_files
+            fi
+            touch $out
+          '';
+
+        "python-examples-syntax" = pkgs.runCommand "python-examples-syntax"
+          {
+            nativeBuildInputs = [ pkgs.python311 ];
+          }
+          ''
+            cd ${self}
+            python - <<'PY'
+            import ast
+            import pathlib
+
+            base = pathlib.Path("quantum/examples")
+            for path in sorted(base.glob("*.py")):
+                source = path.read_text(encoding="utf-8")
+                ast.parse(source, filename=str(path))
+
+            print("python-examples-syntax=ok")
+            PY
+            touch $out
+          '';
 
         "eval-shell-quantum-lab" = pkgs.writeText "eval-shell-quantum-lab.drvpath"
           quantumShells."quantum-lab".drvPath;

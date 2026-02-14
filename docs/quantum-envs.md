@@ -27,6 +27,7 @@ If a framework is present but incompatible in the pinned nixpkgs snapshot, the s
 ```bash
 nix develop .#quantum-lab -c python quantum/examples/tiny_optimization_demo.py
 nix develop .#quantum-lab -c python quantum/examples/qasm_roundtrip_demo.py --allow-missing
+nix develop .#quantum-lab -c python quantum/examples/pennylane_hybrid_demo.py --allow-missing
 ```
 
 ## Smoke test
