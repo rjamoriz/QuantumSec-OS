@@ -23,7 +23,7 @@ echo "[2/4] evaluate linux targets"
 "${NIX[@]}" run .#eval-linux-targets
 
 echo "[3/4] build linux images"
-"${NIX[@]}" build .#quantumsec-iso .#quantumsec-vmware --print-build-logs
+"${NIX[@]}" build .#quantumsec-iso .#quantumsec-vmware-iso .#quantumsec-vmware --print-build-logs
 
 echo "[4/4] build security summaries"
 "${NIX[@]}" build .#quantumsec-security-summary-headless .#quantumsec-security-summary-desktop --print-build-logs

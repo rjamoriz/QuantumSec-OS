@@ -1,6 +1,7 @@
 # Docs
 
 - `threat-model.md`: scope, assumptions, assets, adversaries, mitigations
+- `design.md`: architecture, artifact strategy, and decision rationale
 - `hardening.md`: baseline hardening controls and rationale
 - `build.md`: ISO/VMware build commands and test workflow
 - `quantum-envs.md`: how to use each dev shell and run examples

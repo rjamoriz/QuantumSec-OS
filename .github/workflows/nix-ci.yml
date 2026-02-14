@@ -29,3 +29,6 @@ jobs:
 
       - name: Build quantum smoke check
         run: nix build .#checks.x86_64-linux.smoke-quantum --print-build-logs
+
+      - name: Evaluate VMware ISO target
+        run: nix eval --raw .#packages.x86_64-linux.quantumsec-vmware-iso.drvPath

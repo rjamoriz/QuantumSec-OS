@@ -20,6 +20,7 @@ nix run .#scan-secrets
 
 # Build images
 nix build .#quantumsec-iso
+nix build .#quantumsec-vmware-iso
 nix build .#quantumsec-vmware
 
 # Evaluate Linux target derivations
@@ -53,6 +54,10 @@ nix run .#host-hardening-audit
 ## Supported targets
 
 - `x86_64-linux`
+
+## Design
+
+- Architecture and decisions: `docs/design.md`
 
 ## Layout
 

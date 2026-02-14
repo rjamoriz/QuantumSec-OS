@@ -20,6 +20,10 @@ echo "[eval] linux iso drv"
 drv="$("${NIX[@]}" eval --raw .#packages.x86_64-linux.quantumsec-iso.drvPath)"
 echo "$drv"
 
+echo "[eval] linux vmware-iso drv"
+drv="$("${NIX[@]}" eval --raw .#packages.x86_64-linux.quantumsec-vmware-iso.drvPath)"
+echo "$drv"
+
 echo "[eval] linux vmware drv"
 drv="$("${NIX[@]}" eval --raw .#packages.x86_64-linux.quantumsec-vmware.drvPath)"
 echo "$drv"

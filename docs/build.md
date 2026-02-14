@@ -27,9 +27,10 @@ Checks cover:
 
 ```bash
 nix build .#quantumsec-iso
+nix build .#quantumsec-vmware-iso
 ```
 
-Result symlink points to the ISO derivation output.
+Result symlink points to the ISO derivation output. For VMware ISO-first installs, use `quantumsec-vmware-iso`.
 
 ## 4) Build VMware image (VMDK)
 
