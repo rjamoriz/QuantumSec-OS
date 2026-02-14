@@ -16,6 +16,7 @@ nix flake lock
 
 # Run checks
 nix flake check
+nix run .#scan-secrets
 
 # Build images
 nix build .#quantumsec-iso

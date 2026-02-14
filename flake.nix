@@ -172,6 +172,19 @@
               description = "Evaluate x86_64-linux host/image/security-summary derivation paths";
             };
           };
+          scan-secrets = {
+            type = "app";
+            program = "${hostPkgs.writeShellApplication {
+              name = "scan-secrets";
+              text = ''
+                export RG_BIN="${hostPkgs.ripgrep}/bin/rg"
+                exec "${self}/scripts/scan_for_secrets.sh" "$@"
+              '';
+            }}/bin/scan-secrets";
+            meta = {
+              description = "Scan repository for common secret patterns and forbidden key files";
+            };
+          };
         };
 
       linuxOperatorApps = {
@@ -288,6 +301,17 @@
 
             print("python-examples-syntax=ok")
             PY
+            touch $out
+          '';
+
+        "no-secrets" = pkgs.runCommand "no-secrets"
+          {
+            nativeBuildInputs = [ pkgs.bash pkgs.git pkgs.ripgrep ];
+          }
+          ''
+            cd ${self}
+            export RG_BIN="${pkgs.ripgrep}/bin/rg"
+            bash scripts/scan_for_secrets.sh
             touch $out
           '';
 

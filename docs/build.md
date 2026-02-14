@@ -17,6 +17,7 @@ nix flake check
 Checks cover:
 
 - Nix formatting (`alejandra --check`)
+- Secret and key-pattern scanning (`scripts/scan_for_secrets.sh`)
 - Dev shell evaluation
 - NixOS configuration evaluation
 - Security policy assertions for desktop/headless hosts
