@@ -92,3 +92,13 @@ nix run .#build-linux-artifacts
 ```
 
 This executes checks, target evaluation, image builds, and security summary builds.
+
+## Host audit
+
+After booting a built system, run:
+
+```bash
+nix run .#host-hardening-audit
+```
+
+This validates SSH, firewall, key sysctls, and Nix sandbox settings on the running host.

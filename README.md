@@ -42,6 +42,9 @@ nix run .#run-untrusted-notebook
 
 # One-command Linux validation + artifact builds
 nix run .#build-linux-artifacts
+
+# Post-boot host hardening audit (run on target host)
+nix run .#host-hardening-audit
 ```
 
 ## Supported targets

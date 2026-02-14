@@ -63,4 +63,5 @@ Chosen approach: rootless Podman containers for untrusted notebooks/tools.
 - `users.mutableUsers = true` is set to avoid lockout during first boot; after provisioning SSH keys/passwords, you can switch to immutable users.
 - User accounts are intentionally declared with `hashedPassword = "!"` as a safe default; set SSH keys before deployment.
 - You can generate evaluated policy summaries via `nix build .#quantumsec-security-summary-headless` and `nix build .#quantumsec-security-summary-desktop`.
+- Use `nix run .#host-hardening-audit` on deployed hosts to verify baseline settings.
 - Security-relevant changes should be reflected here and in commit messages.

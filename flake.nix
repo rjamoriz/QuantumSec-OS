@@ -195,6 +195,18 @@
             description = "Run checks and build Linux ISO/VMware/security artifacts";
           };
         };
+        host-hardening-audit = {
+          type = "app";
+          program = "${pkgs.writeShellApplication {
+            name = "host-hardening-audit";
+            text = ''
+              exec "${self}/scripts/host_hardening_audit.sh" "$@"
+            '';
+          }}/bin/host-hardening-audit";
+          meta = {
+            description = "Run post-boot security baseline audit on a NixOS host";
+          };
+        };
       };
     in
     {
