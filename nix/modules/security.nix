@@ -1,4 +1,5 @@
-{...}: {
+{ ... }:
+{
   networking.firewall.enable = true;
   networking.firewall.allowPing = false;
 
@@ -9,7 +10,7 @@
       PasswordAuthentication = false;
       KbdInteractiveAuthentication = false;
       PermitRootLogin = "no";
-      AllowUsers = ["quantum"];
+      AllowUsers = [ "quantum" ];
       X11Forwarding = false;
       AllowTcpForwarding = "no";
       AllowAgentForwarding = false;
@@ -23,12 +24,12 @@
 
   nix.settings = {
     sandbox = true;
-    experimental-features = ["nix-command" "flakes"];
-    trusted-users = ["root" "@wheel"];
-    allowed-users = ["@wheel"];
+    experimental-features = [ "nix-command" "flakes" ];
+    trusted-users = [ "root" "@wheel" ];
+    allowed-users = [ "@wheel" ];
     auto-optimise-store = true;
-    substituters = ["https://cache.nixos.org/"];
-    trusted-substituters = ["https://cache.nixos.org/"];
+    substituters = [ "https://cache.nixos.org/" ];
+    trusted-substituters = [ "https://cache.nixos.org/" ];
   };
 
   security.sudo.wheelNeedsPassword = true;

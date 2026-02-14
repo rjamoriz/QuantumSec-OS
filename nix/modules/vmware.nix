@@ -1,9 +1,6 @@
+{ lib, ... }:
 {
-  lib,
-  pkgs,
-  ...
-}: {
-  environment.systemPackages = [pkgs.open-vm-tools];
+  services.open-vm-tools.enable = true;
 
   # Keep VMware guest support explicit for installer and installed guests.
   virtualisation.vmware.guest.enable = true;

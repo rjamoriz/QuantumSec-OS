@@ -1,4 +1,6 @@
-{pkgs, ...}: {
+{ pkgs, ... }:
+{
+  networking.hostName = "quantumsec";
   networking.networkmanager.enable = true;
 
   time.timeZone = "UTC";
@@ -7,9 +9,9 @@
   users.users.quantum = {
     isNormalUser = true;
     description = "QuantumSec Operator";
-    extraGroups = ["wheel" "networkmanager"];
+    extraGroups = [ "wheel" "networkmanager" ];
     initialPassword = "quantum";
-    openssh.authorizedKeys.keys = [];
+    openssh.authorizedKeys.keys = [ ];
   };
 
   environment.systemPackages = with pkgs; [
